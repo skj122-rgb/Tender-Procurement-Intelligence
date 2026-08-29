@@ -38,7 +38,6 @@ const Profile = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: '👤 Profile & Credentials' },
     { id: 'team', label: '👥 Platform Engineering Team (6 Specialists)' },
     { id: 'security', label: '🔒 Security & Access' }
   ];
@@ -215,59 +214,7 @@ const Profile = () => {
           </div>
         )}
 
-        {/* ─────────────────────────────────────────────────────────────
-            TAB 2: ENGINEERING & OVERSIGHT TEAM (6 SPECIALISTS)
-           ───────────────────────────────────────────────────────────── */}
-        {activeTab === 'team' && (
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">👥</span>
-                <h3 className="text-lg font-bold text-slate-900">Procurement Intelligence Engineering & Oversight Team</h3>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                The platform is architected, maintained, and operated by a multidisciplinary team of 6 domain engineers and procurement specialists.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {teamMembers.map((m, idx) => (
-                <div key={idx} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 hover:border-slate-300 transition shadow-sm flex flex-col justify-between space-y-3">
-                  <div>
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${m.color} text-white font-bold text-sm flex items-center justify-center shadow-sm shrink-0`}>
-                          {m.initials}
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-slate-900 leading-tight">{m.name}</h4>
-                          <p className="text-xs font-semibold text-blue-700 mt-0.5">{m.role}</p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700">
-                        {m.badge}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] font-semibold text-slate-600 bg-white p-2.5 rounded-xl border border-slate-100">
-                      <strong>Focus:</strong> {m.domain}
-                    </p>
-                  </div>
-
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    {m.responsibilities}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-blue-50/60 p-4 rounded-xl border border-blue-100 flex items-center justify-between text-xs text-blue-900">
-              <span className="font-semibold">Engineering Sprint Release: <strong className="font-mono">v2.4.2-prod</strong></span>
-              <span className="text-slate-500">Government of India • Ministry of Finance Compliance</span>
-            </div>
-          </div>
-        )}
-
+       
         {/* ─────────────────────────────────────────────────────────────
             TAB 3: SECURITY & ACCESS
            ───────────────────────────────────────────────────────────── */}
