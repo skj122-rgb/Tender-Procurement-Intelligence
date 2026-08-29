@@ -79,35 +79,7 @@ graph TD
 
 ---
 
-### Step 1: Environment Variables
 
-#### Backend (`backend/.env`):
-```env
-PORT=3000
-NODE_ENV=development
-DATABASE_URL=postgresql://postgres.llizggrehojvloltegve:%23shravan123456789%40@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
-JWT_ACCESS_SECRET=production_secret_key_procurement_intelligence_2024
-JWT_REFRESH_SECRET=production_refresh_key_procurement_intelligence_2024
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
-PYTHON_SERVICE_URL=http://localhost:5001
-
-# Nodemailer Email Configuration (Optional - works in local demo mode out-of-the-box)
-EMAIL_SERVICE=gmail
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_16_digit_app_password
-EMAIL_FROM=noreply@procurement-intel.gov.in
-```
-
-#### Analytics (`analytics/.env`):
-```env
-PORT=5001
-DATABASE_URL=postgresql://postgres.llizggrehojvloltegve:%23shravan123456789%40@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
-```
-
----
-
-### Step 2: Install & Start Services
 
 #### 1. Backend Service (Port 3000)
 ```bash
