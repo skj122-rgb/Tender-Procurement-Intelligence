@@ -19,7 +19,7 @@ A web-based government procurement oversight platform built by a team of 6 engin
 | **Lead Analytics Engineer** | Behavioral Analytics Engine | Python analytics service, 5-point risk models, delay scoring, and cartel heuristics |
 | **Frontend UI/UX Engineer** | Web Client & Dashboards | React 18, Tailwind CSS, Plotly multi-axis radar charts, and responsive UI |
 | **Procurement Domain Specialist** | Tender & BOQ Standards | CPPP notice briefs, Pre-Bid meeting workflows, and MoRTH schedule schemas |
-| **DevOps & QA Engineer** | File Exporters & Test Pipelines | Native client-side PDF/XLS generators, bulk data ingestion, and regression tests |
+
 
 ---
 
