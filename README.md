@@ -6,7 +6,7 @@
 [![Compliance](https://img.shields.io/badge/Compliance-GFR%202017%20%7C%20CVC%20Standards-emerald?style=flat-square)](https://github.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL%2017.6-blue?style=flat-square)](https://supabase.com/)
 
-A web-based government procurement oversight platform built by a team of 6 engineers and domain specialists to assist tender evaluation committees, vigilance officers, and public procurement desks in scrutinizing commercial contractor bids, tracking behavioral anomalies, and generating decision-support dossiers.
+A web-based government procurement oversight platform built by a team of 6 team members to assist tender evaluation committees, vigilance officers, and public procurement desks in scrutinizing commercial contractor bids, tracking behavioral anomalies, and generating decision-support dossiers.
 
 ---
 
