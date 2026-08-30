@@ -6,7 +6,7 @@
 [![Compliance](https://img.shields.io/badge/Compliance-GFR%202017%20%7C%20CVC%20Standards-emerald?style=flat-square)](https://github.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL%2017.6-blue?style=flat-square)](https://supabase.com/)
 
-A web-based government procurement oversight platform built by a team of 6 engineers and domain specialists to assist tender evaluation committees, vigilance officers, and public procurement desks in scrutinizing commercial contractor bids, tracking behavioral anomalies, and generating decision-support dossiers.
+A web-based government procurement oversight platform built by a team of 6 team members to assist tender evaluation committees, vigilance officers, and public procurement desks in scrutinizing commercial contractor bids, tracking behavioral anomalies, and generating decision-support dossiers.
 
 ---
 
@@ -19,7 +19,7 @@ A web-based government procurement oversight platform built by a team of 6 engin
 | **Lead Analytics Engineer** | Behavioral Analytics Engine | Python analytics service, 5-point risk models, delay scoring, and cartel heuristics |
 | **Frontend UI/UX Engineer** | Web Client & Dashboards | React 18, Tailwind CSS, Plotly multi-axis radar charts, and responsive UI |
 | **Procurement Domain Specialist** | Tender & BOQ Standards | CPPP notice briefs, Pre-Bid meeting workflows, and MoRTH schedule schemas |
-| **DevOps & QA Engineer** | File Exporters & Test Pipelines | Native client-side PDF/XLS generators, bulk data ingestion, and regression tests |
+
 
 ---
 
@@ -79,35 +79,7 @@ graph TD
 
 ---
 
-### Step 1: Environment Variables
 
-#### Backend (`backend/.env`):
-```env
-PORT=3000
-NODE_ENV=development
-DATABASE_URL=postgresql://postgres.llizggrehojvloltegve:%23shravan123456789%40@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
-JWT_ACCESS_SECRET=production_secret_key_procurement_intelligence_2024
-JWT_REFRESH_SECRET=production_refresh_key_procurement_intelligence_2024
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
-PYTHON_SERVICE_URL=http://localhost:5001
-
-# Nodemailer Email Configuration (Optional - works in local demo mode out-of-the-box)
-EMAIL_SERVICE=gmail
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_16_digit_app_password
-EMAIL_FROM=noreply@procurement-intel.gov.in
-```
-
-#### Analytics (`analytics/.env`):
-```env
-PORT=5001
-DATABASE_URL=postgresql://postgres.llizggrehojvloltegve:%23shravan123456789%40@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require
-```
-
----
-
-### Step 2: Install & Start Services
 
 #### 1. Backend Service (Port 3000)
 ```bash
