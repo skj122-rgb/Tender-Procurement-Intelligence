@@ -31,6 +31,7 @@ This platform brings the relevant evidence into one workflow:
 
 ### Procurement Workspace
 
+<<<<<<< HEAD
 * Tender catalog with search/filtering
 * Tender detail and bidder information
 * Contractor profiles and execution history
@@ -39,6 +40,8 @@ This platform brings the relevant evidence into one workflow:
 * Dashboard risk distribution and summary metrics
 
 ### Data Center
+=======
+>>>>>>> 0d6b435e96424ee3b21a34c920e3a12036f3bd65
 
 Supports ingestion of:
 
