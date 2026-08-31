@@ -1,153 +1,293 @@
-# 🏛️ Central Public Procurement Intelligence Platform
+# Tender Procurement Intelligence
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-emerald?style=flat-square)](https://github.com/)
-[![Release](https://img.shields.io/badge/Release-v2.4.2--prod-blue?style=flat-square)](https://github.com/)
-[![Team](https://img.shields.io/badge/Team-6%20Specialists-indigo?style=flat-square)](https://github.com/)
-[![Compliance](https://img.shields.io/badge/Compliance-GFR%202017%20%7C%20CVC%20Standards-emerald?style=flat-square)](https://github.com/)
-[![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL%2017.6-blue?style=flat-square)](https://supabase.com/)
+### Smart India Hackathon 2026 - Procurement Risk \& Anomaly Detection
 
-A web-based government procurement oversight platform built by a team of 6 team members to assist tender evaluation committees, vigilance officers, and public procurement desks in scrutinizing commercial contractor bids, tracking behavioral anomalies, and generating decision-support dossiers.
+A decision-support platform for government procurement teams. The system adds an intelligence layer over tender data to help officers **prioritize which tenders need deeper scrutiny** using explainable risk signals, historical comparisons and contractor intelligence.
 
----
+> \\\\\\\*\\\\\\\*Important:\\\\\\\*\\\\\\\* The platform does not declare fraud/corruption and does not automatically award, reject or blacklist a tender. The final decision remains with the authorized officer.
 
-## 👥 Platform Team & Module Ownership
+\---
 
-| Role | Module Ownership | Key Responsibilities |
-| :--- | :--- | :--- |
-| **Lead Systems Architect** | Core Infrastructure & Database | Supabase IPv4 Session Pooler, microservice IPC, connection pooling, and schema design |
-| **Senior Backend Engineer** | API Services & Security | Express REST endpoints, JWT session auth, RBAC middleware, and GFR 2017 rules |
-| **Lead Analytics Engineer** | Behavioral Analytics Engine | Python analytics service, 5-point risk models, delay scoring, and cartel heuristics |
-| **Frontend UI/UX Engineer** | Web Client & Dashboards | React 18, Tailwind CSS, Plotly multi-axis radar charts, and responsive UI |
-| **Procurement Domain Specialist** | Tender & BOQ Standards | CPPP notice briefs, Pre-Bid meeting workflows, and MoRTH schedule schemas |
+## 1\. What the Project Solves
 
+Manual procurement screening becomes difficult when officers have to compare large numbers of tenders, bids and contractor histories.
 
----
+This platform brings the relevant evidence into one workflow:
 
-## 🌟 Core System Capabilities
+**Tender / History -> Cleaning -> Database -> Risk Analysis -> Explainable Score -> Dashboard -> Human Review**
 
-### 1. ⚖️ 5-Point Behavioral Risk Framework (10.0 Points Each)
-The platform evaluates every competing contractor across 5 independent behavioral dimensions, each scored out of **10.0 points** (Total base composite risk: **50.0 points** / Normalized: **100 points**):
-- **Point 01: Past Delivery & Schedule Delay Record (10.0 pts)**: Tracks historical project completion records, time overruns, and milestone slippage.
-- **Point 02: Price Deviation & Rate Aggression Index (10.0 pts)**: Detects predatory or unbalanced unit pricing against standard schedule of rates (SoR).
-- **Point 03: Anti-Collusion & Bidding Anomaly (10.0 pts)**: Scrutinizes submission timestamp bursts, geographic IP coordinates, and bid rotation patterns.
-- **Point 04: Financial Solvency & Working Capital (10.0 pts)**: Evaluates bank solvency certificates, balance sheet liquidity, and capital depth.
-- **Point 05: Technical Quality & Audit Compliance (10.0 pts)**: Assesses star engineering ratings, safety certifications, and certified laboratory testing.
+\---
 
-### 2. 📅 Pre-Bid Conference & Clarification Coordinates
-- Pre-Bid Meeting schedules with exact dates, timings, physical venue, and official NIC WebEx Video Conference coordinates.
-- Clarification query deadlines, nodal officer contacts, and published Minutes of Meeting (MoM).
+## 2\. Core Capabilities
 
-### 3. 📑 Top 5 Bidder Merit Dossiers
-- Ranks top 5 bidders, guaranteeing the **Recommended Most Deserving Contractor** remains at **`🏆 #1`**.
-- Multi-parameter evaluation matrix summarizing schedule adherence, rate safety, and technical ratings.
+### Risk \& Anomaly Intelligence
 
-### 4. 📥 Native Local Storage File Downloads (PDF / XLS)
-- Native client-side file exporter saves formatted documents directly into your local **`Downloads/`** folder:
-  - **Tender Evaluation Merit Dossier** (`.pdf` / `.html`)
-  - **Top 5 Bidder Comparison Matrix** (`.xlsx` / `.csv`)
-  - **Contractor Audit Profile & Execution History** (`.pdf` / `.xlsx`)
-  - **Bill of Quantities (BOQ) Price Bid Schedule** (`.xlsx`)
+* **Price deviation** against tender estimates / baselines
+* **Bid-pattern analysis** using bidder count and bid spread signals
+* **BOQ deviation** analysis
+* **Contractor history** including delays, cancellations, wins and quality indicators
+* **Document / compliance** checks
+* **Isolation Forest** as a supporting statistical anomaly signal when enough historical data is available
 
-### 5. 📂 Data Center Bulk Dataset Ingestion
-- Upload `.xlsx`, `.xls`, `.csv`, `.json`, or `.pdf` files to automatically train 5-parameter behavioral models and persist all extracted tenders, contractors, bids, and risk scorecards directly to PostgreSQL.
+### Procurement Workspace
 
-### 6. ✉️ Nodemailer Email Verification
-- Integrated Nodemailer service for single-step officer account activation via 6-digit Email OTP.
-- Supports direct Gmail configuration (`service: 'gmail'`) as well as custom SMTP servers.
+* Tender catalog with search/filtering
+* Tender detail and bidder information
+* Contractor profiles and execution history
+* Bidder comparison / merit view
+* Risk score breakdown with reasons and evidence
+* Dashboard risk distribution and summary metrics
 
----
+### Data Center
 
-## 🏗️ System Architecture
+Supports ingestion of:
 
-```mermaid
-graph TD
-    A["Frontend Web Client<br/>(React 18 + Vite + Tailwind + Plotly.js)<br/><i>Port: 5173</i>"] -->|"REST APIs (JSON / JWT)"| B["Backend API Service<br/>(Node.js + Express + Nodemailer)<br/><i>Port: 3000</i>"]
-    B -->|"Internal RPC (HTTP)"| C["Analytics Microservice<br/>(Python 3 + Flask + Pandas + Scikit)<br/><i>Port: 5001</i>"]
-    B -->|"PostgreSQL Pooler (Port 5432)"| D[("Supabase Cloud PostgreSQL 17.6<br/>AWS Tokyo (ap-northeast-2)")]
-    C -->|"PostgreSQL Pooler (Port 5432)"| D
-    B -->|"Native Exporters"| E["Client-Side PDF/XLS Downloads"]
+* CSV
+* XLSX / XLS
+* JSON
+* PDF
+
+The ingestion pipeline extracts, cleans and stores procurement records for analysis.
+
+### Reports / Exports
+
+* Tender evaluation / review documents
+* Bidder comparison exports
+* Contractor profile / history exports
+* BOQ price-bid exports
+
+### Officer Security
+
+* JWT-based authentication
+* Role-based access checks
+* Email OTP verification flow
+* Protected application routes
+
+\---
+
+## 3\. Architecture
+
+```text
+                    +-------------------------+
+                    |  React 18 + Vite        |
+                    |  Tailwind + Plotly      |
+                    |  Officer Web Client     |
+                    +-----------+-------------+
+                                |
+                         REST / JSON / JWT
+                                |
+                    +-----------v-------------+
+                    | Node.js + Express       |
+                    | Auth / APIs / Business  |
+                    +-----------+-------------+
+                                |
+                    +-----------v-------------+
+                    | Python Analytics        |
+                    | Flask + Pandas + NumPy  |
+                    | Risk / Feature Engines  |
+                    | Scikit-learn support    |
+                    +-----------+-------------+
+                                |
+                    +-----------v-------------+
+                    | PostgreSQL / Supabase   |
+                    | Tenders / Bids / BOQ    |
+                    | Contractors / Results   |
+                    +-------------------------+
 ```
 
----
+The analytics layer contains separate engines for price, bid pattern, BOQ, contractor and document signals. The main risk engine aggregates these into a bounded score and returns reasons/evidence.
 
-## 🚀 Local Development Setup
+\---
+
+## 4\. Risk Model (Prototype)
+
+The project currently uses five main dimensions:
+
+|Dimension|What it checks|
+|-|-|
+|Past Performance|Delay, cancellation and quality history|
+|Price Deviation|Current bid vs baseline / estimate|
+|Bid Pattern|Bid spread, proximity and timing-related signals|
+|Financial Capacity|Turnover / operational capacity indicators|
+|Document Compliance|Mandatory-document and EMD-related checks|
+
+The system exposes a **0-100 review-priority score**. The exact thresholds/weights are configurable and should be validated against the project dataset before any production use.
+
+\---
+
+## 5\. Current Data Strategy
+
+* Use public / permitted procurement information where available.
+* Clearly label synthetic or controlled demo records.
+* Keep source and file references wherever possible.
+* Do not make allegations about real contractors from an automated score alone.
+* If historical data is insufficient, the system should surface limited confidence rather than fabricate a conclusion.
+
+\---
+
+## 6\. Local Setup
 
 ### Prerequisites
-- **Node.js** v18+ or v20+ LTS
-- **Python** 3.10+ or 3.11+
-- **PostgreSQL / Supabase** database instance
 
----
+* Node.js 18+ (20 LTS recommended)
+* Python 3.10+
+* PostgreSQL / Supabase instance
 
+### Backend
 
-
-#### 1. Backend Service (Port 3000)
 ```bash
 cd backend
 npm install
 npm start
 ```
 
-#### 2. Python Analytics Engine (Port 5001)
+Default development port: `3000`
+
+### Analytics service
+
 ```bash
 cd analytics
+python -m venv .venv
+# Windows PowerShell
+.\\\\\\\\.venv\\\\\\\\Scripts\\\\\\\\Activate.ps1
+
 pip install -r requirements.txt
 python app.py
 ```
 
-#### 3. Frontend Web Client (Port 5173)
+Default port: `5001`
+
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open **http://localhost:5173** in your browser.
+Default Vite port: `5173`
 
----
+Open:
 
-## 🔐 Demo Credentials
+`http://localhost:5173`
 
-| Role | Identifier / Username | Password | Clearance Level |
-| :--- | :--- | :--- | :--- |
-| **Super Administrator** | `admin` | `Admin@123` | Full administrative, ingestion & system management |
-| **Procurement Officer** | `officer_sharma` | `Officer@123` | Tender evaluation, risk analysis & report export |
+\---
 
----
+## 7\. Main API Areas
 
-## 📡 Key REST API Endpoints
+### Authentication
 
-### Authentication & Officer Security
-- `POST /api/auth/signup` — Register officer profile and trigger Nodemailer OTP
-- `POST /api/auth/verify-email-otp` — Verify 6-digit email OTP and activate officer account
-- `POST /api/auth/login` — Authenticate officer and receive JWT bearer token
-- `GET /api/auth/me` — Retrieve active officer profile and security clearance
+* `POST /api/auth/signup`
+* `POST /api/auth/verify-email-otp`
+* `POST /api/auth/login`
+* `GET /api/auth/me`
 
-### Tenders & Contractor Intelligence
-- `GET /api/tenders` — Fetch catalog of public procurement tenders
-- `GET /api/tenders/:id` — Retrieve CPPP brief, pre-bid meeting schedule, bids, and BOQ
-- `GET /api/contractors` — Fetch commercial contractor directory
-- `GET /api/contractors/:id` — Retrieve 5-point risk scorecards and execution history
-- `GET /api/risk/evaluate/:tenderId` — Execute 5-parameter behavioral analysis across bidders
+### Tenders / Contractors
 
-### Data Ingestion & Model Training
-- `POST /api/ingestion/upload` — Ingest `.xlsx`, `.csv`, `.json`, or `.pdf` datasets, auto-train behavioral models, and persist records to PostgreSQL
+* `GET /api/tenders`
+* `GET /api/tenders/:id`
+* `GET /api/contractors`
+* `GET /api/contractors/:id`
 
----
+### Risk / Analysis
 
-## 📜 Sprints & Engineering Changelog
+* `GET /api/tenders/:id/analysis`
+* `POST /api/tenders/:id/analyze`
+* `GET /api/tenders/:id/compare`
+* `GET /api/contractors/:id/risk`
 
-- **Sprint 8 (`v2.4.2-prod`)**: Nodemailer email integration, single-step Email OTP verification, top 5 bidder ranking with #1 merit preservation, native client-side PDF/XLS local storage exporters.
-- **Sprint 7 (`v2.4.1`)**: 10.0-point scale on all 5 separate behavioral parameters across radar charts and profile views.
-- **Sprint 6 (`v2.3.0`)**: Supabase IPv4 Session Pooler connection with SSL encryption.
-- **Sprint 5 (`v2.2.0`)**: Pre-Bid meeting schedule integration and CPPP NIT brief parser.
-- **Sprint 4 (`v2.1.0`)**: Automated data ingestion with PostgreSQL persistence for tenders, bidders, and scorecards.
-- **Sprint 3 (`v2.0.0`)**: Multi-bidder radar overlay matrix and scorecards.
-- **Sprint 2 (`v1.5.0`)**: JWT auth, 2FA OTP verification, GFR 2017 rule engine.
-- **Sprint 1 (`v1.0.0`)**: Project bootstrap, database schemas, and baseline service setup.
+### Ingestion
 
----
+* `POST /api/ingest/upload`
+* `GET /api/ingest/sources`
+* `POST /api/ingest/sources/:id/run-model`
+* `POST /api/ingest/reanalyze-all`
 
-## ⚖️ Standards & Compliance
+> The project also contains an internal Python analytics service used by the backend. Live government API ingestion is not assumed for the hackathon MVP.
 
-Adheres to **General Financial Rules (GFR 2017)**, **Central Vigilance Commission (CVC)** public procurement guidelines, and **Ministry of Road Transport & Highways (MoRTH)** standard data specifications.
+\---
+
+## 8\. Prototype Demo Flow
+
+1. Officer logs in.
+2. Dashboard shows tender / risk summary.
+3. Open the tender catalog and filter records.
+4. Open a tender and inspect bidders / BOQ / procurement details.
+5. Open contractor history.
+6. Run / view risk analysis.
+7. Inspect the score breakdown and reasons.
+8. Compare bidders.
+9. Export the relevant review document.
+10. Officer performs the final human review.
+
+\---
+
+## 9\. Recommended MVP Boundary
+
+The strongest demonstrable path is:
+
+**Upload -> Clean -> Store -> Search -> Tender -> Bidder -> Analyse -> Score -> Explain -> Compare -> Review**
+
+Advanced items such as live government APIs, richer bidder graphs, OCR/LLM extraction and automated report generation should remain secondary until the core end-to-end flow is stable.
+
+\---
+
+## 10\. Project Structure
+
+```text
+Tender-Procurement-Intelligence/
+├── frontend/          # React UI, dashboards, routes, charts
+├── backend/           # Express API, auth, ingestion, services
+├── analytics/         # Python analytics + feature/risk engines
+├── README.md
+└── .env.example
+```
+
+### Frontend highlights
+
+* `src/pages/` - application screens
+* `src/components/` - reusable UI and dashboard components
+* `src/api/client.js` - API client
+* `src/context/AuthContext.jsx` - authentication state
+
+### Backend highlights
+
+* `src/routes/` - API routes
+* `src/controllers/` - request handling
+* `src/services/` - application logic
+* `src/middleware/` - auth, validation, upload and error handling
+* `src/config/` - environment/database/mock configuration
+
+### Analytics highlights
+
+* `processing/` - data ingestion and cleaning
+* `engine/` - risk/anomaly analysis
+* `app.py` - Flask analytics service
+
+\---
+
+## 11\. Engineering \& Governance Principles
+
+* **Explainability first:** show what caused a score.
+* **Evidence over accusation:** an anomaly is a review signal, not proof of wrongdoing.
+* **Human in the loop:** authorized officers retain decision authority.
+* **Source awareness:** preserve provenance and distinguish demo data from production data.
+* **Reliable MVP first:** do not sacrifice the core vertical slice for flashy but fragile features.
+
+\---
+
+## 12\. Authors / Team
+
+* **Project:** Tender Procurement Intelligence  
+* **Track**: Software
+* 
+* **Team Members:**
+* **Shreyansh Maurya** — Team Leader \& Frontend
+* **Soumya Singh** — Frontend
+* **Shravan Kumar Jaiswal** — Database \& Backend
+* **Darsheel Singh** — Backend
+* **Mayank Jain** — Data Processing, Risk Engine \& Python Features
+* **Shubham Prajapat** — Data Processing, Risk Engine \& Python Features
+* 
+* **Purpose:** Explainable procurement-risk decision support for human review
+
