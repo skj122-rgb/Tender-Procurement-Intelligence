@@ -1,0 +1,31 @@
+const OTP_PURPOSES = {
+  SIGNUP_EMAIL: 'SIGNUP_EMAIL',
+  SIGNUP_PHONE: 'SIGNUP_PHONE',
+  PASSWORD_RESET_EMAIL: 'PASSWORD_RESET_EMAIL',
+  PASSWORD_RESET_PHONE: 'PASSWORD_RESET_PHONE'
+};
+
+const RISK_LEVELS = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
+const ACCOUNT_STATUS = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  SUSPENDED: 'suspended'
+};
+
+const USER_ROLES = {
+  OFFICER: 'officer',
+  ADMIN: 'admin'
+};
+
+module.exports = {
+  OTP_PURPOSES,
+  RISK_LEVELS,
+  ACCOUNT_STATUS,
+  USER_ROLES
+};
