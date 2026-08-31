@@ -51,11 +51,6 @@ The platform evaluates every competing contractor across 5 independent behaviora
 ### 5. 📂 Data Center Bulk Dataset Ingestion
 - Upload `.xlsx`, `.xls`, `.csv`, `.json`, or `.pdf` files to automatically train 5-parameter behavioral models and persist all extracted tenders, contractors, bids, and risk scorecards directly to PostgreSQL.
 
-### 6. ✉️ Nodemailer Email Verification
-- Integrated Nodemailer service for single-step officer account activation via 6-digit Email OTP.
-- Supports direct Gmail configuration (`service: 'gmail'`) as well as custom SMTP servers.
-
----
 
 ## 🏗️ System Architecture
 
