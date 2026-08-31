@@ -6,7 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 import Badge from './Badge';
 import { downloadPdfDocument, downloadExcelFile } from '../../utils/fileDownloader';
 
-const BidderDetailModal = ({ contractorId, isOpen, onClose }) => {
+const BidderDetailModal = ({ contractorId, isOpen, onClose, bidParameters }) => {
   const navigate = useNavigate();
   const [contractor, setContractor] = useState(null);
   const [performance, setPerformance] = useState([]);
@@ -38,23 +38,58 @@ const BidderDetailModal = ({ contractorId, isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const totalProjects = performance.length;
-  const delayedProjects = performance.filter(p => (p.delay_days || 0) > 0).length;
-  const delayRate = totalProjects > 0 ? Math.round((delayedProjects / totalProjects) * 100) : 0;
-  const avgQuality = totalProjects > 0
-    ? (performance.reduce((acc, p) => acc + parseFloat(p.quality_rating || 4.2), 0) / totalProjects).toFixed(1)
-    : '4.5';
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center justify-center">
+          <LoadingSpinner message="Loading contractor multi-parameter profile..." />
+        </div>
+      </div>
+    );
+  }
+
+  if (!contractor) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center space-y-4">
+          <span className="text-3xl">🏢</span>
+          <p className="text-sm font-bold text-slate-800">Contractor profile not found in active dataset.</p>
+          <button 
+            onClick={onClose}
+            className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
+          >
+            Close Window
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalProjects = performance.length || contractor.total_bids || 4;
+  const delayRate = contractor.delayRate ?? contractor.delay_rate ?? (performance.length > 0 ? Math.round((performance.filter(p => (p.delay_days || 0) > 0).length / performance.length) * 100) : 0);
+  const avgQuality = contractor.avgQuality ?? contractor.avg_quality ?? '4.5';
   
   // 5 Specific Evaluated Parameters (10 Points Each)
-  const param1_delay = delayRate >= 50 ? 8.5 : delayRate >= 25 ? 5.5 : delayRate > 0 ? 2.5 : 1.0;
-  const param2_price = 1.5;
-  const param3_collusion = 1.0;
-  const param4_finance = 1.2;
-  const param5_quality = parseFloat(avgQuality) < 3.5 ? 6.5 : parseFloat(avgQuality) < 4.0 ? 3.5 : 1.0;
+  const p = bidParameters || contractor.parameters || {};
+  const param1_delay = (p.pastPerformance !== undefined || p.past_performance !== undefined)
+    ? Number(((p.pastPerformance ?? p.past_performance) / 2.0).toFixed(1))
+    : (delayRate >= 50 ? 8.5 : delayRate >= 25 ? 5.5 : delayRate > 0 ? 2.5 : 1.2);
+  const param2_price = (p.priceDeviation !== undefined || p.price_deviation !== undefined)
+    ? Number(((p.priceDeviation ?? p.price_deviation) / 2.0).toFixed(1))
+    : 2.0;
+  const param3_collusion = (p.bidPatternTiming !== undefined || p.bid_pattern !== undefined)
+    ? Number(((p.bidPatternTiming ?? p.bid_pattern) / 2.0).toFixed(1))
+    : 1.5;
+  const param4_finance = (p.financialCapacity !== undefined || p.financial_solvency !== undefined)
+    ? Number(((p.financialCapacity ?? p.financial_solvency) / 2.0).toFixed(1))
+    : 2.2;
+  const param5_quality = (p.documentCompliance !== undefined || p.document_compliance !== undefined)
+    ? Number(((p.documentCompliance ?? p.document_compliance) / 2.0).toFixed(1))
+    : (parseFloat(avgQuality) < 3.5 ? 6.5 : parseFloat(avgQuality) < 4.0 ? 3.5 : 1.2);
 
   const total50Score = Number((param1_delay + param2_price + param3_collusion + param4_finance + param5_quality).toFixed(1));
-  const total100Score = Math.round(total50Score * 2);
-  const riskLevel = total100Score >= 70 ? 'CRITICAL' : total100Score >= 50 ? 'HIGH' : total100Score >= 30 ? 'MEDIUM' : 'LOW';
+  const total100Score = contractor.riskScore ? Math.round(contractor.riskScore) : Math.round(total50Score * 2);
+  const riskLevel = contractor.riskLevel || (total50Score >= 25 ? 'HIGH' : total50Score >= 15 ? 'MEDIUM' : 'LOW');
 
   const paramsList = [
     {
@@ -167,7 +202,7 @@ const BidderDetailModal = ({ contractorId, isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-blue-950 text-white flex justify-between items-start">
+        <div className="px-6 py-5 bg-linear-to-r from-slate-900 via-slate-800 to-blue-950 text-white flex justify-between items-start">
           <div>
             <div className="flex items-center gap-2.5">
               <span className="text-xl">🏢</span>
@@ -247,7 +282,7 @@ const BidderDetailModal = ({ contractorId, isOpen, onClose }) => {
                     5-Point Behavioral Risk Parameters (10.0 Points Each)
                   </h4>
                   <span className="text-xs font-extrabold text-slate-700 font-mono">
-                    Total: {total50Score} / 50.0 pts ({total100Score}/100)
+                    Total: {total50Score} / 50.0 pts ({riskLevel} RISK)
                   </span>
                 </div>
 

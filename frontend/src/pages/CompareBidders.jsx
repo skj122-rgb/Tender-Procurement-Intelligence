@@ -65,13 +65,32 @@ const CompareBidders = () => {
 
   // Helper to convert parameters to 10 points each
   const get10PtParams = (b) => {
-    const p1 = b.delayRate >= 50 ? 8.5 : b.delayRate >= 25 ? 5.5 : b.delayRate > 0 ? 2.5 : 1.0;
-    const p2 = Math.abs(b.priceDeviation || 0) > 20 ? 7.5 : Math.abs(b.priceDeviation || 0) > 10 ? 4.0 : 1.5;
-    const p3 = (b.submissionMinutesBeforeClosing && b.submissionMinutesBeforeClosing < 5) ? 6.5 : 1.0;
-    const p4 = 1.2;
-    const p5 = parseFloat(b.avgQuality || 4.5) < 3.5 ? 6.5 : 1.0;
+    if (b && b.parameters) {
+      const p = b.parameters;
+      const rawP1 = p.pastPerformance ?? p.past_performance ?? (b.delayRate * 0.2);
+      const rawP2 = p.priceDeviation ?? p.price_deviation ?? Math.abs(b.priceDeviation || 0);
+      const rawP3 = p.bidPatternTiming ?? p.bid_pattern ?? (b.submissionMinutesBeforeClosing < 5 ? 6.5 : 2.0);
+      const rawP4 = p.financialCapacity ?? p.financial_solvency ?? 3.5;
+      const rawP5 = p.documentCompliance ?? p.document_compliance ?? 3.0;
+
+      const p1 = Number(Math.min(10, Math.max(0.5, rawP1 / 2)).toFixed(1));
+      const p2 = Number(Math.min(10, Math.max(0.5, rawP2 / 2)).toFixed(1));
+      const p3 = Number(Math.min(10, Math.max(0.5, rawP3 / 2)).toFixed(1));
+      const p4 = Number(Math.min(10, Math.max(0.5, rawP4 / 2)).toFixed(1));
+      const p5 = Number(Math.min(10, Math.max(0.5, rawP5 / 2)).toFixed(1));
+      
+      const total50 = Number((p1 + p2 + p3 + p4 + p5).toFixed(1));
+      const total100 = b.riskScore ? Math.round(b.riskScore) : Math.round(total50 * 2);
+      return { p1, p2, p3, p4, p5, total50, total100 };
+    }
+
+    const p1 = b.delayRate >= 50 ? 8.5 : b.delayRate >= 25 ? 5.5 : b.delayRate > 0 ? 2.5 : 1.2;
+    const p2 = Math.abs(b.priceDeviation || 0) > 20 ? 8.0 : Math.abs(b.priceDeviation || 0) > 10 ? 5.0 : 1.8;
+    const p3 = (b.submissionMinutesBeforeClosing && b.submissionMinutesBeforeClosing < 5) ? 6.5 : 1.5;
+    const p4 = 2.0;
+    const p5 = parseFloat(b.avgQuality || 4.5) < 3.5 ? 6.5 : parseFloat(b.avgQuality || 4.5) < 4.0 ? 3.5 : 1.2;
     const total50 = Number((p1 + p2 + p3 + p4 + p5).toFixed(1));
-    return { p1, p2, p3, p4, p5, total50, total100: Math.round(total50 * 2) };
+    return { p1, p2, p3, p4, p5, total50, total100: b.riskScore ? Math.round(b.riskScore) : Math.round(total50 * 2) };
   };
 
   // Build Radar Chart Data comparing all bidders on the 5 core parameters

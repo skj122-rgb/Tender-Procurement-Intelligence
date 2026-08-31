@@ -8,7 +8,6 @@ const ResetPassword = () => {
   const identifier = location.state?.identifier || '';
 
   const [emailOtp, setEmailOtp] = useState('');
-  const [phoneOtp, setPhoneOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,10 +19,10 @@ const ResetPassword = () => {
       return;
     }
     try {
-      await post('/auth/reset-password', { identifier, emailOtp, phoneOtp, newPassword });
-      navigate('/login', { state: { message: 'Password reset successful. Please login.' } });
+      await post('/auth/reset-password', { identifier, emailOtp, newPassword, confirmPassword });
+      navigate('/login', { state: { message: '✓ Password reset successful. Please login with your new password.' } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Error resetting password.');
+      setError(err.response?.data?.message || 'Error resetting password. Please check your verification code.');
     }
   };
 
@@ -32,26 +31,44 @@ const ResetPassword = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md border border-gray-100">
         <h2 className="text-center text-3xl font-extrabold text-gray-900">Set New Password</h2>
         
-        {error && <div className="bg-red-50 text-red-700 p-3 rounded">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 p-3 rounded text-xs font-semibold">{error}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email OTP</label>
-            <input type="text" required className="mt-1 block w-full px-3 py-2 border rounded-md" value={emailOtp} onChange={e => setEmailOtp(e.target.value)} />
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Email Verification Code (OTP)</label>
+            <input 
+              type="text" 
+              required 
+              maxLength={6}
+              placeholder="6-digit verification code"
+              className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm font-mono focus:ring-blue-500 focus:border-blue-500" 
+              value={emailOtp} 
+              onChange={e => setEmailOtp(e.target.value)} 
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone OTP</label>
-            <input type="text" required className="mt-1 block w-full px-3 py-2 border rounded-md" value={phoneOtp} onChange={e => setPhoneOtp(e.target.value)} />
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">New Password</label>
+            <input 
+              type="password" 
+              required 
+              placeholder="Enter new password"
+              className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm" 
+              value={newPassword} 
+              onChange={e => setNewPassword(e.target.value)} 
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">New Password</label>
-            <input type="password" required className="mt-1 block w-full px-3 py-2 border rounded-md" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Confirm Password</label>
+            <input 
+              type="password" 
+              required 
+              placeholder="Confirm new password"
+              className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm" 
+              value={confirmPassword} 
+              onChange={e => setConfirmPassword(e.target.value)} 
+            />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input type="password" required className="mt-1 block w-full px-3 py-2 border rounded-md" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-          </div>
-          <button type="submit" className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+          <button type="submit" className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition">
             Reset Password
           </button>
         </form>

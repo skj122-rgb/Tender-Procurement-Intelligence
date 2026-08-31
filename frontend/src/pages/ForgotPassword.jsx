@@ -30,8 +30,8 @@ const ForgotPassword = () => {
             <label className="block text-sm font-medium text-gray-700">Username, Email or Unique ID</label>
             <input type="text" required className="mt-1 block w-full px-3 py-2 border rounded-md" value={identifier} onChange={e => setIdentifier(e.target.value)} />
           </div>
-          <button type="submit" className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-            Send Reset OTPs
+          <button type="submit" className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition">
+            Send Verification Code
           </button>
         </form>
         <div className="text-center">

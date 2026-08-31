@@ -4,7 +4,6 @@ import apiClient from '../api/client';
 import DataTable from '../components/common/DataTable';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import BidderDetailModal from '../components/common/BidderDetailModal';
-import Badge from '../components/common/Badge';
 import { downloadPdfDocument, downloadExcelFile } from '../utils/fileDownloader';
 
 const TenderDetails = () => {
@@ -19,6 +18,7 @@ const TenderDetails = () => {
 
   // Modal for contractor / bidder history
   const [selectedContractorId, setSelectedContractorId] = useState(null);
+  const [selectedBidParameters, setSelectedBidParameters] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -44,8 +44,9 @@ const TenderDetails = () => {
     fetchTenderData();
   }, [id]);
 
-  const handleOpenBidderModal = (contractorId) => {
+  const handleOpenBidderModal = (contractorId, parameters = null) => {
     setSelectedContractorId(contractorId);
+    setSelectedBidParameters(parameters);
     setIsModalOpen(true);
   };
 
@@ -116,28 +117,34 @@ const TenderDetails = () => {
   const openDateStr = tender.open_date ? String(tender.open_date).slice(0, 10) : '2024-01-15';
   const closeDateStr = tender.close_date ? String(tender.close_date).slice(0, 10) : '2024-03-15';
 
-  const preBid = tender.pre_bid_meeting || tender.cppp_notice_brief?.pre_bid_meeting || {
-    is_scheduled: true,
-    meeting_date: openDateStr,
-    meeting_time: '11:30 AM IST',
-    meeting_mode: 'Hybrid (Physical Conference & NIC Video Conference WebEx)',
-    venue: `Conference Hall, Office of Superintending Engineer, ${tender.department || 'Public Works'}, ${tender.state || 'National'}`,
-    vc_link: `https://meet.nic.in/procurement-prebid-${tenderCode.replace('/', '_')}`,
-    meeting_id: `NIC-${tenderCode.slice(-4)}8290`,
-    passcode: '981240',
-    query_submission_deadline: `${openDateStr} 05:00 PM (Through e-Procurement Portal)`,
-    clarifications_published: true,
-    officer_in_charge: `Executive Engineer (Contracts & Works), ${tender.department || 'Procuring Authority'}`,
-    contact_email: `tenders-desk.${(tender.department || 'pwd').toLowerCase().slice(0,4)}@gov.in`,
-    minutes_of_meeting_summary: `Pre-bid meeting completed with participating contractors. Addendum issued regarding site accessibility and machinery deployment schedules.`
-  };
+  const preBid = (tender.pre_bid_meeting && Object.keys(tender.pre_bid_meeting).length > 0)
+    ? tender.pre_bid_meeting
+    : (tender.cppp_notice_brief?.pre_bid_meeting && Object.keys(tender.cppp_notice_brief.pre_bid_meeting).length > 0)
+      ? tender.cppp_notice_brief.pre_bid_meeting
+      : {
+          is_scheduled: true,
+          meeting_date: openDateStr,
+          meeting_time: '11:30 AM IST',
+          meeting_mode: 'Hybrid (Physical Conference & NIC Video Conference WebEx)',
+          venue: `Conference Hall, Office of Superintending Engineer, ${tender.department || 'Public Works'}, ${tender.state || 'National'}`,
+          vc_link: `https://meet.nic.in/procurement-prebid-${tenderCode.replace('/', '_')}`,
+          meeting_id: `NIC-${tenderCode.slice(-4)}8290`,
+          passcode: '981240',
+          query_submission_deadline: `${openDateStr} 05:00 PM (Through e-Procurement Portal)`,
+          clarifications_published: true,
+          officer_in_charge: `Executive Engineer (Contracts & Works), ${tender.department || 'Procuring Authority'}`,
+          contact_email: `tenders-desk.${(tender.department || 'pwd').toLowerCase().slice(0,4)}@gov.in`,
+          minutes_of_meeting_summary: `Pre-bid meeting completed with participating contractors. Addendum issued regarding site accessibility and machinery deployment schedules.`
+        };
 
-  const cppp = tender.cppp_notice_brief || {
-    cppp_tender_id: `CPPP_${tenderCode.replace('-', '_').replace('/', '_')}`,
-    tender_reference: `NIT/${tender.department?.slice(0, 3)?.toUpperCase() || 'GOV'}/${tenderCode}`,
-    tender_type: 'Open Tender (Two Packet System)',
-    tender_category: 'Works & Infrastructure',
-    procuring_authority: `Procurement Authority, ${tender.department}, ${tender.state}`,
+  const cppp = (tender.cppp_notice_brief && Object.keys(tender.cppp_notice_brief).length > 0)
+    ? tender.cppp_notice_brief
+    : {
+        cppp_tender_id: `CPPP_${tenderCode.replace('-', '_').replace('/', '_')}`,
+        tender_reference: `NIT/${tender.department?.slice(0, 3)?.toUpperCase() || 'GOV'}/${tenderCode}`,
+        tender_type: 'Open Tender (Two Packet System)',
+        tender_category: 'Works & Infrastructure',
+        procuring_authority: `Procurement Authority, ${tender.department}, ${tender.state}`,
     tender_fee: `₹${Math.max(1000, Math.round(estNum * 0.0005)).toLocaleString('en-IN')}`,
     emd_amount: `₹${(Math.round(estNum * 0.02)).toLocaleString('en-IN')} (2.0% Bank Guarantee / FDR)`,
     emd_exemption: 'Applicable for Registered MSE / DPIIT recognized startups as per GFR Rule 170',
@@ -194,12 +201,6 @@ const TenderDetails = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button 
-            onClick={() => navigate(`/compare-bidders?tenderId=${id}`)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5"
-          >
-            <span>⚖️</span> Bidder Behavioral Risk Matrix
-          </button>
         </div>
       </div>
 
@@ -348,30 +349,7 @@ const TenderDetails = () => {
               </div>
             </div>
 
-            {/* Video Conference Link Box */}
-            <div className="bg-gradient-to-r from-blue-900 to-indigo-950 text-white p-6 rounded-2xl shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                  <h4 className="text-sm font-extrabold uppercase tracking-wider text-blue-200">Official Video Conference Access (NIC WebEx / VC)</h4>
-                  <p className="text-xs text-slate-300 mt-0.5 font-mono">{preBid.vc_link}</p>
-                </div>
-                <div className="flex gap-2">
-                  <a
-                    href={preBid.vc_link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition shadow"
-                  >
-                    🎥 Join VC Meeting Room
-                  </a>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-4 text-xs pt-3 border-t border-white/10">
-                <span>Meeting ID: <strong className="text-white font-mono">{preBid.meeting_id}</strong></span>
-                <span>Passcode: <strong className="text-white font-mono">{preBid.passcode}</strong></span>
-                <span>Officer: <strong className="text-white">{preBid.officer_in_charge}</strong></span>
-              </div>
-            </div>
+
 
             {/* Minutes of Meeting / Published Clarifications */}
             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3">
@@ -431,25 +409,14 @@ const TenderDetails = () => {
                         );
                       } 
                     },
-                    {
-                      header: 'Behavioral Risk Score',
-                      cell: (row, idx) => {
-                        const score = row.parameters?.total_risk_score || row.risk_score || (idx === 1 ? 38.5 : 14.0);
-                        const level = score >= 50 ? 'HIGH' : score >= 30 ? 'MEDIUM' : 'LOW';
-                        return (
-                          <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${level === 'LOW' ? 'bg-emerald-100 text-emerald-800' : level === 'MEDIUM' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'}`}>
-                            {score}/100 ({level})
-                          </span>
-                        );
-                      }
-                    },
+
                     { 
                       header: 'Actions', 
                       cell: (row) => (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenBidderModal(row.contractor_id);
+                            handleOpenBidderModal(row.contractor_id, row.parameters);
                           }}
                           className="px-3 py-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 rounded-lg text-xs font-bold transition flex items-center gap-1.5"
                         >
@@ -459,7 +426,7 @@ const TenderDetails = () => {
                     }
                   ]} 
                   data={bids}
-                  onRowClick={(row) => handleOpenBidderModal(row.contractor_id)}
+                  onRowClick={(row) => handleOpenBidderModal(row.contractor_id, row.parameters)}
                 />
               </div>
             )}
@@ -507,7 +474,12 @@ const TenderDetails = () => {
       <BidderDetailModal
         contractorId={selectedContractorId}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedContractorId(null);
+          setSelectedBidParameters(null);
+        }}
+        bidParameters={selectedBidParameters}
       />
     </div>
   );

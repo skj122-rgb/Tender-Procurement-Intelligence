@@ -1,12 +1,7 @@
--- ============================================================================
--- GOVERNMENT PROCUREMENT INTELLIGENCE SYSTEM
--- PostgreSQL Schema Definition
--- ============================================================================
 
--- 1. Enable Required Extensions
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 2. Custom Enumerated Types
+--  Custom Enumerated Types
 CREATE TYPE user_role AS ENUM ('officer', 'admin');
 CREATE TYPE account_status_type AS ENUM ('pending', 'active', 'suspended');
 CREATE TYPE otp_purpose_type AS ENUM (
@@ -51,9 +46,7 @@ BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
--- ============================================================================
 -- TABLE 2: otp_verifications
--- ============================================================================
 CREATE TABLE otp_verifications (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -66,9 +59,7 @@ CREATE TABLE otp_verifications (
     created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 3: token_blacklist
--- ============================================================================
 CREATE TABLE token_blacklist (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     token_jti  VARCHAR(255) NOT NULL UNIQUE,
@@ -77,9 +68,7 @@ CREATE TABLE token_blacklist (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 4: tenders
--- ============================================================================
 CREATE TABLE tenders (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id       VARCHAR(100) NOT NULL UNIQUE,
@@ -108,9 +97,8 @@ BEFORE UPDATE ON tenders
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
--- ============================================================================
+
 -- TABLE 5: contractors
--- ============================================================================
 CREATE TABLE contractors (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name                VARCHAR(255) NOT NULL,
@@ -131,9 +119,7 @@ BEFORE UPDATE ON contractors
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
--- ============================================================================
 -- TABLE 6: bids
--- ============================================================================
 CREATE TABLE bids (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id       UUID NOT NULL REFERENCES tenders(id) ON DELETE CASCADE,
@@ -148,9 +134,7 @@ CREATE TABLE bids (
     CONSTRAINT uq_tender_contractor_bid UNIQUE (tender_id, contractor_id)
 );
 
--- ============================================================================
 -- TABLE 7: boq_items (Bill of Quantities)
--- ============================================================================
 CREATE TABLE boq_items (
     id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id        UUID NOT NULL REFERENCES tenders(id) ON DELETE CASCADE,
@@ -164,9 +148,7 @@ CREATE TABLE boq_items (
     CONSTRAINT uq_tender_boq_item UNIQUE (tender_id, item_number)
 );
 
--- ============================================================================
 -- TABLE 8: contractor_performance
--- ============================================================================
 CREATE TABLE contractor_performance (
     id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     contractor_id         UUID NOT NULL REFERENCES contractors(id) ON DELETE CASCADE,
@@ -181,9 +163,7 @@ CREATE TABLE contractor_performance (
     created_at            TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 9: risk_results
--- ============================================================================
 CREATE TABLE risk_results (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id         UUID NOT NULL REFERENCES tenders(id) ON DELETE CASCADE,
@@ -201,9 +181,7 @@ CREATE TABLE risk_results (
     created_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 10: data_sources
--- ============================================================================
 CREATE TABLE data_sources (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name         VARCHAR(255) NOT NULL,
@@ -216,9 +194,7 @@ CREATE TABLE data_sources (
     created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 11: documents
--- ============================================================================
 CREATE TABLE documents (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id   UUID REFERENCES tenders(id) ON DELETE CASCADE,
@@ -229,9 +205,7 @@ CREATE TABLE documents (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- INDEXES
--- ============================================================================
 
 -- Users & Auth
 CREATE INDEX idx_users_account_status ON users(account_status);

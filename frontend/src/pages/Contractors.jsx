@@ -4,7 +4,6 @@ import apiClient from '../api/client';
 import DataTable from '../components/common/DataTable';
 import SearchBar from '../components/common/SearchBar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import Badge from '../components/common/Badge';
 
 const Contractors = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,19 +73,7 @@ const Contractors = () => {
         </span>
       ) 
     },
-    {
-      header: 'Behavioral Risk Rating',
-      cell: (row, idx) => {
-        const score = idx === 1 ? 42.0 : idx === 3 ? 12.5 : idx === 5 ? 36.0 : 18.0;
-        const level = score >= 50 ? 'HIGH' : score >= 30 ? 'MEDIUM' : 'LOW';
-        return (
-          <div className="flex items-center gap-2">
-            <Badge level={level} />
-            <span className="text-xs font-black text-slate-700">{score}/100</span>
-          </div>
-        );
-      }
-    },
+
     { 
       header: 'Actions', 
       cell: (row) => (

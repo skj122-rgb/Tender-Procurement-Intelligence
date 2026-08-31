@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import DataTable from '../components/common/DataTable';
-import Badge from '../components/common/Badge';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import BidderDetailModal from '../components/common/BidderDetailModal';
 
@@ -30,16 +29,19 @@ const RiskAnalysis = () => {
     fetchContractors();
   }, []);
 
-  const enrichedContractors = contractors.map((c, idx) => {
-    const score = idx === 1 ? 43 : idx === 3 ? 13 : idx === 5 ? 38 : (idx === 7 ? 68 : 18);
-    const level = score >= 60 ? 'HIGH' : score >= 35 ? 'MEDIUM' : 'LOW';
-    const delayRate = idx === 1 ? 50 : idx === 5 ? 35 : (idx === 7 ? 60 : 0);
-    const avgQuality = idx === 1 ? 3.8 : idx === 5 ? 3.5 : (idx === 7 ? 3.0 : 4.6);
+  const enrichedContractors = contractors.map((c) => {
+    const score = c.riskScore ?? c.risk_score ?? 25.0;
+    const level = c.riskLevel ?? c.risk_level ?? (score >= 60 ? 'HIGH' : score >= 35 ? 'MEDIUM' : 'LOW');
+    const delayRate = c.delayRate ?? c.delay_rate ?? 0;
+    const avgQuality = c.avgQuality ?? c.avg_quality ?? 4.5;
     
-    let keySignal = 'Clean on-time track record with verified quality.';
-    if (delayRate >= 50) keySignal = `⚠️ Severe Delay Risk: ${delayRate}% of past public works delayed.`;
-    else if (delayRate > 0) keySignal = `⚠️ Schedule Variance: ${delayRate}% historical delay rate.`;
-    else if (avgQuality >= 4.5) keySignal = `🛡️ Verified High Engineering Quality: ${avgQuality}★ rating.`;
+    let keySignal = c.keySignal ?? c.key_signal;
+    if (!keySignal) {
+      if (delayRate >= 50) keySignal = `⚠️ Severe Delay Risk: ${delayRate}% of past public works delayed.`;
+      else if (delayRate > 0) keySignal = `⚠️ Schedule Variance: ${delayRate}% historical delay rate.`;
+      else if (avgQuality >= 4.5) keySignal = `🛡️ Verified High Engineering Quality: ${avgQuality}★ rating.`;
+      else keySignal = 'Clean on-time track record with verified quality standards.';
+    }
 
     return {
       ...c,
@@ -80,15 +82,7 @@ const RiskAnalysis = () => {
       header: 'Quality Rating', 
       cell: (row) => <span className="font-bold text-slate-800 text-xs">{row.avgQuality} ★ / 5.0</span> 
     },
-    { 
-      header: 'Behavioral Risk Score', 
-      cell: (row) => (
-        <div className="flex items-center gap-2">
-          <Badge level={row.riskLevel} />
-          <span className="font-bold text-xs text-slate-800">{row.riskScore}/100</span>
-        </div>
-      ) 
-    },
+
     {
       header: 'Key Behavioral Signal',
       cell: (row) => <span className="text-xs text-slate-600 leading-snug">{row.keySignal}</span>

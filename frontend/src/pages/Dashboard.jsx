@@ -37,8 +37,8 @@ const Dashboard = () => {
 
   const highCritical = summary?.highCriticalCount || 0;
   const totalTenders = summary?.totalTenders || recentTenders.length || 0;
-  const totalContractors = summary?.totalContractors || 7;
-  const totalBids = summary?.totalBids || (totalTenders * 4) || 0;
+  const totalContractors = summary?.totalContractors ?? 0;
+  const totalBids = summary?.totalBids ?? 0;
 
   // Format risk distribution array for chart
   const riskDistData = summary?.riskDistribution 
@@ -46,30 +46,34 @@ const Dashboard = () => {
         ? summary.riskDistribution 
         : Object.entries(summary.riskDistribution).map(([label, value]) => ({ label, value })))
     : [
-        { label: 'LOW', value: Math.max(1, Math.round(totalTenders * 0.6)) },
-        { label: 'MEDIUM', value: Math.round(totalTenders * 0.3) },
-        { label: 'HIGH', value: Math.round(totalTenders * 0.1) },
+        { label: 'LOW', value: Math.max(1, Math.round(totalTenders * 0.65)) },
+        { label: 'MEDIUM', value: Math.round(totalTenders * 0.25) },
+        { label: 'HIGH', value: Math.round(totalTenders * 0.10) },
         { label: 'CRITICAL', value: 0 }
       ];
 
-  // Group tenders by department for chart
-  const deptCounts = {};
-  recentTenders.forEach(t => {
-    const dept = t.department || 'Public Works Department';
-    deptCounts[dept] = (deptCounts[dept] || 0) + 1;
-  });
-  const deptChartData = Object.entries(deptCounts).map(([department, count]) => ({ department, count }));
+  // Group tenders by department for chart from complete dataset summary
+  const deptChartData = summary?.departmentDistribution && summary.departmentDistribution.length > 0
+    ? summary.departmentDistribution
+    : (() => {
+        const deptCounts = {};
+        recentTenders.forEach(t => {
+          const dept = t.department || 'Public Works Department';
+          deptCounts[dept] = (deptCounts[dept] || 0) + 1;
+        });
+        return Object.entries(deptCounts).map(([department, count]) => ({ department, count }));
+      })();
 
   return (
     <div className="space-y-6">
       {/* Alert Ticker */}
-      <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-4 rounded-r-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white shadow-sm">
+      <div className="bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-4 rounded-r-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white shadow-sm">
         <div className="flex items-center gap-3">
           <span className="text-xl">⚠️</span>
           <div>
             <p className="text-xs font-bold text-amber-900 uppercase tracking-wider">Priority Review Alert</p>
             <p className="text-xs text-slate-700 mt-0.5">
-              <strong className="text-slate-900 font-semibold">{highCritical} active tenders</strong> exhibit elevated risk scores (over 60/100) requiring additional officer scrutiny before financial award.
+              <strong className="text-slate-900 font-semibold">{highCritical} active tenders</strong> exhibit elevated risk scores (over 30 / 50 pts) requiring additional officer scrutiny before financial award.
             </p>
           </div>
         </div>
@@ -110,7 +114,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <button
           onClick={() => navigate('/data-center')}
           className="p-3.5 bg-white hover:bg-blue-50/60 rounded-xl border border-slate-200 hover:border-blue-200 transition text-left flex items-center gap-3 shadow-sm group"
@@ -134,19 +138,6 @@ const Dashboard = () => {
           <div>
             <p className="text-xs font-bold text-slate-800">Tender Catalog</p>
             <p className="text-[11px] text-slate-500">Filter & view active tenders</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => navigate('/compare-bidders')}
-          className="p-3.5 bg-white hover:bg-purple-50/60 rounded-xl border border-slate-200 hover:border-purple-200 transition text-left flex items-center gap-3 shadow-sm group"
-        >
-          <div className="w-10 h-10 rounded-lg bg-purple-100 group-hover:bg-purple-600 group-hover:text-white text-purple-700 flex items-center justify-center text-lg transition shrink-0">
-            ⚖️
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-800">Bidder Matrix</p>
-            <p className="text-[11px] text-slate-500">5-Parameter radar scoring</p>
           </div>
         </button>
 

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Plot from 'react-plotly.js';
 import apiClient from '../api/client';
 import DataTable from '../components/common/DataTable';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import Badge from '../components/common/Badge';
 import { downloadPdfDocument, downloadExcelFile } from '../utils/fileDownloader';
 
 const ContractorDetails = () => {
@@ -39,23 +37,21 @@ const ContractorDetails = () => {
   if (loading) return <LoadingSpinner message="Loading contractor multi-parameter behavioral profile..." />;
   if (!contractor) return <div className="p-8 text-center text-slate-500">Contractor record not found.</div>;
 
-  const totalProjects = performance.length;
-  const delayedProjects = performance.filter(p => (p.delay_days || 0) > 0).length;
-  const delayRate = totalProjects > 0 ? Math.round((delayedProjects / totalProjects) * 100) : 0;
-  const avgQuality = totalProjects > 0 
-    ? (performance.reduce((acc, p) => acc + parseFloat(p.quality_rating || 4.2), 0) / totalProjects).toFixed(1) 
-    : '4.5';
+  const totalProjects = performance.length || contractor.total_bids || 4;
+  const delayRate = contractor.delayRate ?? contractor.delay_rate ?? (performance.length > 0 ? Math.round((performance.filter(p => (p.delay_days || 0) > 0).length / performance.length) * 100) : 0);
+  const avgQuality = contractor.avgQuality ?? contractor.avg_quality ?? '4.5';
   
   // 5 Separate Behavioral Parameters - Explicit 10 Points Scale Each
-  const param1_delay = delayRate >= 50 ? 8.5 : delayRate >= 25 ? 5.5 : delayRate > 0 ? 2.5 : 1.0;
-  const param2_price = 1.5;
-  const param3_collusion = 1.0;
-  const param4_finance = 1.2;
-  const param5_quality = parseFloat(avgQuality) < 3.5 ? 6.5 : parseFloat(avgQuality) < 4.0 ? 3.5 : 1.0;
+  const p = contractor.parameters || {};
+  const param1_delay = p.pastPerformance ? Number((p.pastPerformance / 2).toFixed(1)) : (delayRate >= 50 ? 8.5 : delayRate >= 25 ? 5.5 : delayRate > 0 ? 2.5 : 1.2);
+  const param2_price = p.priceDeviation ? Number((p.priceDeviation / 2).toFixed(1)) : 2.0;
+  const param3_collusion = p.bidPatternTiming ? Number((p.bidPatternTiming / 2).toFixed(1)) : 1.5;
+  const param4_finance = p.financialCapacity ? Number((p.financialCapacity / 2).toFixed(1)) : 2.2;
+  const param5_quality = p.documentCompliance ? Number((p.documentCompliance / 2).toFixed(1)) : (parseFloat(avgQuality) < 3.5 ? 6.5 : parseFloat(avgQuality) < 4.0 ? 3.5 : 1.2);
 
   const total50Score = Number((param1_delay + param2_price + param3_collusion + param4_finance + param5_quality).toFixed(1));
-  const total100Score = Math.round(total50Score * 2);
-  const riskLevel = total100Score >= 70 ? 'CRITICAL' : total100Score >= 50 ? 'HIGH' : total100Score >= 30 ? 'MEDIUM' : 'LOW';
+  const total100Score = contractor.riskScore ? Math.round(contractor.riskScore) : Math.round(total50Score * 2);
+  const riskLevel = contractor.riskLevel || (total100Score >= 70 ? 'CRITICAL' : total100Score >= 50 ? 'HIGH' : total100Score >= 30 ? 'MEDIUM' : 'LOW');
 
   const behavioralParams = [
     {
@@ -204,7 +200,6 @@ const ContractorDetails = () => {
           </button>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{contractor.name}</h1>
-            <Badge level={riskLevel} />
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Reg No: <span className="font-mono font-bold text-slate-800">{contractor.registration_number}</span> | 
@@ -223,13 +218,7 @@ const ContractorDetails = () => {
 
         {/* Risk Score Pill & Action Buttons */}
         <div className="flex flex-col gap-3 w-full md:w-auto">
-          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Composite 5-Point Risk</p>
-            <p className={`text-3xl font-black mt-1 ${total100Score >= 50 ? 'text-red-600' : 'text-emerald-600'}`}>
-              {total50Score} <span className="text-xs font-bold text-slate-400">/ 50.0 pts</span>
-            </p>
-            <p className="text-[10px] font-extrabold uppercase mt-0.5 text-slate-600">{total100Score}/100 • {riskLevel} RISK</p>
-          </div>
+
 
           <div className="flex flex-wrap gap-2">
             <button
@@ -255,53 +244,7 @@ const ContractorDetails = () => {
         </div>
       )}
 
-      {/* 5 behavioral risk scorecards */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">⚖️</span>
-            <h3 className="text-base font-extrabold text-slate-900 uppercase tracking-tight">
-              5-Point Behavioral Risk Parameters (10 Points Each)
-            </h3>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Independent behavioral evaluation across 5 distinct risk vectors scored out of 10.0 points each (Total: 50.0 pts).
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-          {behavioralParams.map((p) => (
-            <div key={p.num} className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 flex flex-col justify-between space-y-3">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[11px] font-mono font-black text-blue-600 uppercase">Point {p.num}</span>
-                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${p.level === 'LOW' ? 'bg-emerald-100 text-emerald-800' : p.level === 'MEDIUM' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>
-                    {p.level} RISK
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 leading-snug">{p.title}</h4>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{p.detail}</p>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Assessed Risk Score</span>
-                  <span className="text-sm font-black text-slate-900">
-                    {p.score.toFixed(1)} <span className="text-[10px] font-semibold text-slate-400">/ 10.0 pts</span>
-                  </span>
-                </div>
-                {/* Progress Bar */}
-                <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className={`h-full ${p.color} transition-all duration-300`} 
-                    style={{ width: `${(p.score / 10) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -325,29 +268,7 @@ const ContractorDetails = () => {
         </div>
       </div>
 
-      {/* Visual Behavioral Radar Graph */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-        <h3 className="text-base font-bold text-slate-900 mb-2">5-Axis Competency & Reliability Radar</h3>
-        <div className="w-full h-[280px] max-w-full overflow-hidden flex items-center justify-center">
-          <Plot 
-            data={radarData}
-            layout={{
-              polar: { 
-                radialaxis: { visible: true, range: [0, 100], tickfont: { size: 9, color: '#94a3b8' } } 
-              },
-              margin: { t: 20, b: 20, l: 30, r: 30 },
-              autosize: true,
-              height: 280,
-              paper_bgcolor: 'rgba(0,0,0,0)',
-              plot_bgcolor: 'rgba(0,0,0,0)',
-              font: { family: 'ui-sans-serif, system-ui' }
-            }}
-            useResizeHandler={true}
-            style={{ width: '100%', height: '100%' }}
-            config={{ responsive: true, displayModeBar: false }}
-          />
-        </div>
-      </div>
+
 
       {/* Historical Projects & Past Tenders Execution Track Record */}
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">

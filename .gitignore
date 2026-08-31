@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pyo
+
+# Environment
+.env
+.env.local
+.env.production
+.env.example
+
+# Uploads
+uploads/
+
+# Build
+frontend/dist/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker
+pgdata/
+
+# Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+venv/
+.venv/

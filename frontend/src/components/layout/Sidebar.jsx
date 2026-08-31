@@ -11,7 +11,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Tenders Catalog', path: '/tenders', icon: '📄' },
     { name: 'Contractors Directory', path: '/contractors', icon: '🏢' },
     { name: 'Bidder Risk Analysis', path: '/risk-analysis', icon: '⚠️' },
-    { name: 'Bidder Behavioral Matrix', path: '/compare-bidders', icon: '⚖️' },
     { name: 'Reports & Dossiers', path: '/reports', icon: '📈' },
     { name: 'My Profile', path: '/profile', icon: '👤' },
   ];

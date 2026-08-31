@@ -45,7 +45,7 @@ const Profile = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Officer ID Header Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 text-white rounded-2xl p-8 shadow-md relative overflow-hidden">
+      <div className="bg-linear-to-r from-slate-900 via-slate-800 to-blue-900 text-white rounded-2xl p-8 shadow-md relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 opacity-10 text-9xl">🛡️</div>
         
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
