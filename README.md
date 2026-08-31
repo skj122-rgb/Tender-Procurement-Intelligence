@@ -4,7 +4,7 @@
 
 A decision-support platform for government procurement teams. The system adds an intelligence layer over tender data to help officers **prioritize which tenders need deeper scrutiny** using explainable risk signals, historical comparisons and contractor intelligence.
 
-> \\\\\\\*\\\\\\\*Important:\\\\\\\*\\\\\\\* The platform does not declare fraud/corruption and does not automatically award, reject or blacklist a tender. The final decision remains with the authorized officer.
+> **Important** The platform does not declare fraud/corruption and does not automatically award, reject or blacklist a tender. The final decision remains with the authorized officer.
 
 \---
 
